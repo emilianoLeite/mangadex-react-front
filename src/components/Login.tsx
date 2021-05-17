@@ -1,8 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 import { useLogin } from "../hooks/useLogin";
 
 interface Props {
-  onLogin: ({ session, refresh } : { session: string, refresh: string }) => unknown;
+  onLogin: ({
+    session,
+    refresh,
+  }: {
+    session: string;
+    refresh: string;
+  }) => unknown;
 }
 
 export function Login({ onLogin }: Props) {
@@ -16,10 +22,25 @@ export function Login({ onLogin }: Props) {
 
   return (
     <form onSubmit={(e) => e.preventDefault()}>
-      <input name="username" type="text" onChange={(e) => setUsername(e.target.value)}/>
-      <input name="password" type="password" onChange={(e) => setPassword(e.target.value)}/>
-      <button name="log in" type="button" onClick={() => login({ username, password })}> Log in </button>
+      <input
+        name="username"
+        type="text"
+        onChange={(e) => setUsername(e.target.value)}
+      />
+      <input
+        name="password"
+        type="password"
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <button
+        name="log in"
+        type="button"
+        onClick={() => login({ username, password })}
+      >
+        {" "}
+        Log in{" "}
+      </button>
       {error ? <span>{error.message}</span> : <></>}
     </form>
-  )
+  );
 }
