@@ -1,18 +1,31 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import {
   QueryClient,
   QueryClientProvider,
 } from "react-query";
-import { Login } from "./components/Login"
+import { LoginPage } from "./pages/public/LoginPage"
+import { PrivatePages } from "./pages/private/PrivatePages"
+import { UserTokens } from "./hooks/useLogin";
 
 const queryClient = new QueryClient();
+export const AuthContext = React.createContext<UserTokens | undefined>(undefined)
 
 export function App() {
+  const [tokens, setTokens] = useState<UserTokens>();
+  
+  useEffect(() => {
+    console.log('tokens', tokens)
+    return () => { }
+  }, [tokens])
+
   return (
     <QueryClientProvider client={queryClient}>
-      <Login/>
+      <AuthContext.Provider value={tokens}>
+
+        {tokens ? <PrivatePages/> :<LoginPage onLogin={setTokens}/>}
+      </AuthContext.Provider>
     </QueryClientProvider>
   );
 }
