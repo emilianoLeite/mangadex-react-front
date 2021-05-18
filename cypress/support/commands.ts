@@ -25,16 +25,15 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-Cypress.Commands.add("loginByForm", (username, password) => {
+Cypress.Commands.add("login", (username, password) => {
   Cypress.log({
-    name: "loginByForm",
+    name: "login",
     message: `${username} | ${password}`,
   });
 
   return cy.request({
     method: "POST",
-    url: "/login",
-    form: true,
+    url: "https://api.mangadex.org/auth/login",
     body: {
       username,
       password,
