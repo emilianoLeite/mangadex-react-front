@@ -2,6 +2,8 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
+    "cypress/globals": true,
+    node: true,
   },
   extends: [
     "eslint:recommended",
@@ -17,7 +19,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["react", "@typescript-eslint"],
+  plugins: ["react", "@typescript-eslint", "cypress"],
   rules: {
     indent: ["error", 2],
     "linebreak-style": ["error", "unix"],

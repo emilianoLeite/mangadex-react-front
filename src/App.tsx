@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -15,7 +14,6 @@ export function App() {
 
   useEffect(() => {
     console.log("tokens", tokens);
-    return () => {};
   }, [tokens]);
 
   return (
