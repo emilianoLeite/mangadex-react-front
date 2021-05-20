@@ -1,0 +1,10 @@
+{ 
+  "result": "error",
+  "errors": [{
+    "id": "cypress_fixture",
+    "status": 401,
+    "title": "unauthorized_http_exception",
+    "detail": null,
+    "context": null
+  }]
+}

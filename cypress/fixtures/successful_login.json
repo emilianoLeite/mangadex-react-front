@@ -1,0 +1,7 @@
+{
+  "result": "ok",
+  "token": {
+    "session": "session_token",
+    "refresh": "refresh_token"
+  }
+}

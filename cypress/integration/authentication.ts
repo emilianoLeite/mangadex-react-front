@@ -1,27 +1,45 @@
 /// <reference types="cypress" />
-
-describe("Logging In - HTML Web Form", function () {
-  // we can use these values to log in
-  const username = "jane.lae";
-  const password = "password123";
-
+describe("Authentication - HTML Web Form", function () {
   context("HTML form submission", function () {
     beforeEach(() => cy.visit("/"));
-    it("displays errors on login", function () {
-      // incorrect username on purpose
-      cy.get("input[name=username]").type("jane.lae");
-      cy.get("input[name=password]").type("password123");
+
+    it("handles errors and success", function () {
+      const unauthorizedStatusCode = 401;
+      cy.intercept(
+        {
+          method: "POST",
+          url: "https://api.mangadex.org/auth/login",
+          times: 1,
+        },
+        {
+          statusCode: unauthorizedStatusCode,
+          fixture: "failed_login.json",
+        }
+      );
+
+      cy.get("input[name=username]").type("jane.lane");
+      cy.get("input[name=password]").type("wrong_password");
       cy.get('button[name="log in"]').click();
 
-      // we should have visible errors now
       cy.get("span")
         .should("be.visible")
-        .and("contain", "Request failed with status code 401");
-    });
+        .and(
+          "contain",
+          `Request failed with status code ${unauthorizedStatusCode}`
+        );
 
-    it("shows HomePage on success", function () {
-      cy.get("input[name=username]").type(username);
-      cy.get("input[name=password]").type(password);
+      cy.intercept(
+        {
+          method: "POST",
+          url: "https://api.mangadex.org/auth/login",
+          times: 1,
+        },
+        {
+          statusCode: 200,
+          fixture: "successful_login.json",
+        }
+      );
+      cy.get("input[name=password]").clear().type("right_password");
       cy.get('button[name="log in"]').click();
 
       cy.get("h1").should("contain", "Welcome!");
