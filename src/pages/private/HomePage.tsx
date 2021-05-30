@@ -1,5 +1,9 @@
-import React from "react";
-
+import { FollowedMangaList } from "../../components/FollowedMangaList";
 export function HomePage() {
-  return <h1>Welcome!</h1>;
+  return (
+    <>
+      <h1>Welcome!</h1>;
+      <FollowedMangaList />
+    </>
+  );
 }

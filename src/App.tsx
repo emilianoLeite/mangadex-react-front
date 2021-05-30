@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { LoginPage } from "./pages/public/LoginPage";
@@ -6,10 +6,10 @@ import { PrivatePages } from "./pages/private/PrivatePages";
 import { UserTokens } from "./hooks/useLogin";
 
 const queryClient = new QueryClient();
-export const AuthContext =
-  React.createContext<UserTokens | undefined>(undefined);
+export const AuthContext = createContext<UserTokens | undefined>(undefined);
 
 export function App() {
+  // TODO useStoredCredentials
   const [tokens, setTokens] = useState<UserTokens>();
 
   useEffect(() => {
@@ -116,6 +116,3 @@ export function App() {
 //     </div>
 //   );
 // }
-
-const rootElement = document.getElementById("root");
-ReactDOM.render(<App />, rootElement);

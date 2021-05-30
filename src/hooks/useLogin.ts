@@ -17,11 +17,13 @@ interface UserCredentials {
 
 export function useLogin() {
   return useMutation<LoginResponse, AxiosError, UserCredentials>(
-    async ({ username, password }: { username: string; password: string }) => {
+    async ({ username, password }: UserCredentials) => {
       const { data } = await axios.post<LoginResponse>(
         "https://api.mangadex.org/auth/login",
         { username, password }
       );
+
+      // TODO set credentials
       return data;
     },
     { mutationKey: "login" }

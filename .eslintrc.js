@@ -24,5 +24,8 @@ module.exports = {
     indent: ["error", 2],
     "linebreak-style": ["error", "unix"],
     "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-unused-vars": "error",
+    "react/jsx-uses-react": "off",
+    "react/react-in-jsx-scope": "off",
   },
 };
