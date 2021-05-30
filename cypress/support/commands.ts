@@ -25,18 +25,22 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
-Cypress.Commands.add("login", (username, password) => {
-  Cypress.log({
-    name: "login",
-    message: `${username} | ${password}`,
-  });
+Cypress.Commands.add(
+  "login",
+  (
+    { sessionToken, refreshToken } = {
+      sessionToken: "cy-session-token",
+      refreshToken: "cy-refresh-token",
+    }
+  ) => {
+    Cypress.log({
+      name: "storing credentials",
+      message: `Session: ${sessionToken} \n Refresh: ${refreshToken}`,
+    });
 
-  return cy.request({
-    method: "POST",
-    url: "https://api.mangadex.org/auth/login",
-    body: {
-      username,
-      password,
-    },
-  });
-});
+    window.localStorage.setItem("session-token", sessionToken);
+    window.localStorage.setItem("refresh-token", refreshToken);
+
+    return;
+  }
+);

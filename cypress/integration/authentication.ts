@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-describe("Authentication - HTML Web Form", function () {
+describe("Authentication", function () {
   context("HTML form submission", function () {
     beforeEach(() => cy.visit("/"));
 
@@ -46,17 +46,15 @@ describe("Authentication - HTML Web Form", function () {
     });
   });
 
-  // context('Reusable "login" custom command', function () {
-  //   beforeEach(function () {
-  //     // login before each test
-  //     cy.login(username, password);
-  //   });
+  context("when user is already logged in", () => {
+    beforeEach(() => {
+      cy.login();
+    });
 
-  //   it("can visit /dashboard", function () {
-  //     // after cy.request, the session cookie has been set
-  //     // and we can visit a protected page
-  //     cy.visit("/");
-  //     cy.get("h1").should("contain", "Welcome");
-  //   });
-  // });
+    it("displays the Home Page at the root", () => {
+      cy.visit("/");
+
+      cy.get("h1").should("contain", "Welcome!");
+    });
+  });
 });

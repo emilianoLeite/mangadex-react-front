@@ -20,7 +20,7 @@ import "./commands";
 
 declare namespace Cypress {
   interface Chainable {
-    login(username: string, password: string): Chainable;
+    login(credentials?: { sessionToken: string; refreshToken: string }): void;
   }
 }
 // Alternatively you can use CommonJS syntax:

@@ -1,13 +1,7 @@
-import { Login } from "../../components/Login";
+import { Login, Props as LoginProps } from "../../components/Login";
 
 interface Props {
-  onLogin: ({
-    session,
-    refresh,
-  }: {
-    session: string;
-    refresh: string;
-  }) => unknown;
+  onLogin: LoginProps["onLogin"];
 }
 
 export function LoginPage({ onLogin }: Props) {

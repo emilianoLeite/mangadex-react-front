@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useLogin } from "../hooks/useLogin";
 
-interface Props {
+export interface Props {
   onLogin: ({
-    session,
-    refresh,
+    sessionToken,
+    refreshToken,
   }: {
-    session: string;
-    refresh: string;
+    sessionToken: string;
+    refreshToken: string;
   }) => unknown;
 }
 
@@ -17,7 +17,11 @@ export function Login({ onLogin }: Props) {
   const { mutate: login, error, data } = useLogin();
 
   useEffect(() => {
-    if (data) onLogin(data.token);
+    if (data)
+      onLogin({
+        sessionToken: data.token.session,
+        refreshToken: data.token.refresh,
+      });
   }, [data, onLogin]);
 
   return (
