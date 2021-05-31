@@ -1,17 +1,12 @@
-import { createContext } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { LoginPage } from "./pages/public/LoginPage";
-import { PrivatePages } from "./pages/private/PrivatePages";
-import {
-  StoredCredentials,
-  useStoredCredentials,
-} from "./hooks/useStoredCredentials/useStoredCredentials";
+import { useStoredCredentials } from "./hooks/useStoredCredentials/useStoredCredentials";
+import { AuthContext } from "./hooks/useAuthContext";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import { HomePage } from "./pages/private/HomePage";
+import { PrivateRoutes } from "./pages/private/PrivateRoutes";
 
 const queryClient = new QueryClient();
-export const AuthContext = createContext<StoredCredentials>({
-  refreshToken: null,
-  sessionToken: null,
-});
 
 export function App() {
   const { credentials, storeCredentials, areCredentialsValid } =
@@ -19,13 +14,23 @@ export function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthContext.Provider value={credentials}>
-        {areCredentialsValid ? (
-          <PrivatePages />
-        ) : (
-          <LoginPage onLogin={storeCredentials} />
-        )}
-      </AuthContext.Provider>
+      <Router>
+        <Switch>
+          {areCredentialsValid(credentials) ? (
+            <PrivateRoutes>
+              <AuthContext.Provider value={credentials}>
+                <Route exact path="/">
+                  <HomePage />
+                </Route>
+              </AuthContext.Provider>
+            </PrivateRoutes>
+          ) : (
+            <Route exact path="/">
+              <LoginPage onLogin={storeCredentials} />
+            </Route>
+          )}
+        </Switch>
+      </Router>
     </QueryClientProvider>
   );
 }

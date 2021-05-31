@@ -1,29 +1,33 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 interface NewCredentials {
   sessionToken: string;
   refreshToken: string;
 }
 
-export interface StoredCredentials {
+interface StoredCredentials {
   sessionToken: string | null;
   refreshToken: string | null;
 }
 
+export type ValidCredentials = {
+  [K in keyof StoredCredentials]: NonNullable<StoredCredentials[K]>;
+};
+
 const sessionTokenKey = "session-token";
 const refreshTokenKey = "refresh-token";
+
+function areCredentialsValid(
+  credentials: StoredCredentials
+): credentials is ValidCredentials {
+  return !!credentials.refreshToken && !!credentials.sessionToken;
+}
 
 export function useStoredCredentials() {
   const [credentials, setCredentials] = useState<StoredCredentials>({
     sessionToken: window.localStorage.getItem(sessionTokenKey),
     refreshToken: window.localStorage.getItem(refreshTokenKey),
   });
-  const [areCredentialsValid, setAreCredentialsValid] = useState(false);
-  useEffect(() => {
-    setAreCredentialsValid(
-      !!credentials.refreshToken && !!credentials.sessionToken
-    );
-  }, [credentials]);
 
   function storeCredentials({
     sessionToken: newSession,
