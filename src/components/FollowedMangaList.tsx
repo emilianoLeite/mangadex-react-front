@@ -1,16 +1,31 @@
 import axios from "axios";
 import { useQuery } from "react-query";
 
-interface FollowedMangaList {
+interface MangadexFollowedMangaList {
   id: string;
 }
 
+interface Props {
+  authToken: string;
+}
+
 // TODO finish implementation
-export function FollowedMangaList() {
+export function FollowedMangaList({ authToken }: Props) {
   const { data } = useQuery("followed-manga-list", () => {
-    return axios.get<FollowedMangaList>(
-      "https://api.mangadex.org/user/follows/manga/feed"
+    return axios.get<MangadexFollowedMangaList>(
+      "https://api.mangadex.org/user/follows/manga/feed",
+      {
+        headers: {
+          Authorization: `bearer ${authToken}`,
+        },
+      }
     );
   });
-  return <div>{JSON.stringify(data)}</div>;
+
+  return (
+    <>
+      <h1>Followed Manga</h1>
+      <div>{JSON.stringify(data)}</div>
+    </>
+  );
 }
