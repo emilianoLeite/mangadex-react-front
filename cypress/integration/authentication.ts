@@ -43,6 +43,11 @@ describe("Authentication", function () {
       cy.get('button[name="log in"]').click();
 
       cy.get("h1").should("contain", "Welcome!");
+
+      // verify that tokens were persisted:
+      cy.reload();
+
+      cy.get("h1").should("contain", "Welcome!");
     });
   });
 
