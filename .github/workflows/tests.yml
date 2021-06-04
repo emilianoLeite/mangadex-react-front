@@ -1,4 +1,4 @@
-name: Jest Tests
+name: Tests
 
 on: [push]
 
@@ -26,10 +26,18 @@ jobs:
         with:
           node-version: '14.x'
 
-
-      - name: Cache retrieved successfully?
-        run: echo ${{steps.yarn-cache.outputs.cache-hit}}
-
-
       - run: yarn --frozen-lockfile
       - run: yarn test
+
+  cypress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      # Install NPM dependencies, cache them correctly
+      # and run all Cypress tests
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          build: yarn build
+          start: yarn start
