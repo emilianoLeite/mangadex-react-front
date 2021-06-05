@@ -10,7 +10,6 @@ interface Credentials {
 }
 
 const fifteenMinutesFromNow = 15 * 60 * 1000;
-const sessionTokenTTLTime = fifteenMinutesFromNow;
 const sessionTokenTTLKey = "session-token-ttl";
 const sessionTokenKey = "session-token";
 const refreshTokenKey = "refresh-token";
@@ -24,24 +23,17 @@ const refreshTokenKey = "refresh-token";
 //   // salva localStorage
 //   // salva na closure?
 // }
-export async function getFreshSessionToken(): Promise<SessionToken> {
-  // verifica TTL do sessionToken
-  // -- se expirado, usa o refresh pra pegar um novo
-  // ---- se falhar, temos que explodir algum erro, e limpar storage
-  // -- se valido, retorna session
-  const { sessionTTL, sessionToken, refreshToken } =
-    ensureCredentialsArePersisted();
 
-  if (new Date().getTime() < sessionTTL) {
-    return Promise.resolve(sessionToken);
-  } else {
-    try {
-      const { sessionToken } = await refreshCredentials(refreshToken);
-      return sessionToken;
-    } catch {
-      return Promise.reject();
-    }
-  }
+function storeCredentials(credentials: Credentials) {
+  window.localStorage.setItem(sessionTokenKey, credentials.sessionToken);
+  window.localStorage.setItem(sessionTokenTTLKey, `${credentials.sessionTTL}`);
+  window.localStorage.setItem(refreshTokenKey, credentials.refreshToken);
+}
+
+function clearStorage() {
+  window.localStorage.removeItem(sessionTokenKey);
+  window.localStorage.removeItem(sessionTokenTTLKey);
+  window.localStorage.removeItem(refreshTokenKey);
 }
 
 function ensureCredentialsArePersisted() {
@@ -72,6 +64,25 @@ async function refreshCredentials(refreshToken: string): Promise<Credentials> {
   return {
     refreshToken: token.refresh,
     sessionToken: token.session,
-    sessionTTL: new Date().getTime() + sessionTokenTTLTime,
+    sessionTTL: new Date().getTime() + fifteenMinutesFromNow,
   };
+}
+
+export async function getFreshSessionToken(): Promise<SessionToken> {
+  const { sessionToken, sessionTTL, refreshToken } =
+    ensureCredentialsArePersisted();
+
+  if (new Date().getTime() < sessionTTL) {
+    return sessionToken;
+  } else {
+    try {
+      const newCredentials = await refreshCredentials(refreshToken);
+      storeCredentials(newCredentials);
+
+      return newCredentials.sessionToken;
+    } catch (e) {
+      clearStorage();
+      throw e;
+    }
+  }
 }
