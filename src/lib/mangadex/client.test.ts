@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom/extend-expect";
 import axios from "axios";
-import { getFreshSessionToken } from "./client";
+import type { LoginResponse } from "mangadex-client";
+import { getFreshSessionToken, login } from "./client";
 import type { RefreshTokenResponse } from "./interfaces";
 
 const mockedAxios = axios as jest.Mocked<typeof axios>;
@@ -84,7 +85,7 @@ describe("#getFreshSessionToken", () => {
         it("rejects with error and clears storage", async () => {
           expect.assertions(4);
           const axiosError = { error: "anyError" };
-          mockedAxios.post.mockRejectedValueOnce(axiosError);
+          mockedAxios.request.mockRejectedValueOnce(axiosError);
 
           await expect(getFreshSessionToken()).rejects.toEqual(axiosError);
           expect(window.localStorage.getItem("session-token-ttl")).toBeNull();
@@ -92,6 +93,41 @@ describe("#getFreshSessionToken", () => {
           expect(window.localStorage.getItem("refresh-token")).toBeNull();
         });
       });
+    });
+  });
+});
+
+describe("#login", () => {
+  describe("when request is successful", () => {
+    it("stores and returns credentials", async () => {
+      // expect.assertions(4);
+      const loginResponse = {
+        token: {
+          session: "new-session",
+          refresh: "new-refresh",
+        },
+      } as LoginResponse;
+      const axiosResponse = {
+        data: loginResponse,
+      };
+      mockedAxios.request.mockResolvedValue(axiosResponse);
+      const userCredentials = { username: "user", password: "123" };
+
+      const result = await login(userCredentials);
+
+      expect(result.refreshToken).toEqual("new-refresh");
+      expect(result.sessionToken).toEqual("new-session");
+      // TODO: freeze time so we can assert TTL
+      // expect(result.sessionTTL).toEqual(fifteenMinutesFromNow);
+      expect(window.localStorage.getItem("refresh-token")).toEqual(
+        "new-refresh"
+      );
+      expect(window.localStorage.getItem("session-token")).toEqual(
+        "new-session"
+      );
+      // expect(window.localStorage.getItem("session-token-ttl")).toEqual(
+      //   fifteenMinutesFromNow
+      // );
     });
   });
 });
