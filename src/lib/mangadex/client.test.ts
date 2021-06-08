@@ -52,6 +52,7 @@ describe("#getFreshSessionToken", () => {
         const fifteenMinutesFromNow = new Date().getTime() + 1000 * 60 * 15;
 
         it.skip("returns the new sessionToken and stores it", async () => {
+          expect.assertions(4);
           const refreshTokenResponse = {
             token: {
               session: "new-session",
@@ -62,7 +63,6 @@ describe("#getFreshSessionToken", () => {
             data: refreshTokenResponse,
           };
           mockedAxios.post.mockResolvedValue(axiosResponse);
-          expect.assertions(4);
 
           const freshToken = await getFreshSessionToken();
 
@@ -82,17 +82,14 @@ describe("#getFreshSessionToken", () => {
 
       describe("when refresh request is sucessful fails", () => {
         it("rejects with error and clears storage", async () => {
+          expect.assertions(4);
           const axiosError = { error: "anyError" };
           mockedAxios.post.mockRejectedValueOnce(axiosError);
-          expect.assertions(4);
 
           await expect(getFreshSessionToken()).rejects.toEqual(axiosError);
-
-          expect(window.localStorage.getItem("session-token-ttl")).toEqual(
-            null
-          );
-          expect(window.localStorage.getItem("session-token")).toEqual(null);
-          expect(window.localStorage.getItem("refresh-token")).toEqual(null);
+          expect(window.localStorage.getItem("session-token-ttl")).toBeNull();
+          expect(window.localStorage.getItem("session-token")).toBeNull();
+          expect(window.localStorage.getItem("refresh-token")).toBeNull();
         });
       });
     });

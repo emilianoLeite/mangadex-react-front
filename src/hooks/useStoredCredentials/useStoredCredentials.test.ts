@@ -47,8 +47,8 @@ describe("when the credentials were not previously stored", () => {
         current: { credentials },
       },
     } = renderHook(() => useStoredCredentials());
-    expect(credentials.sessionToken).toEqual(null);
-    expect(credentials.refreshToken).toEqual(null);
+    expect(credentials.sessionToken).toBeNull();
+    expect(credentials.refreshToken).toBeNull();
   });
 
   it("allows setting new credentials", () => {
