@@ -1,7 +1,6 @@
 import { authApi } from "./AuthApi";
-import type {
-  Login as MangadexUserCredentials
-} from "mangadex-client";
+import type { Login as MangadexUserCredentials } from "mangadex-client";
+import { chapterApi } from "./ChapterApi";
 
 type SessionToken = string;
 
@@ -16,9 +15,15 @@ const sessionTokenTTLKey = "session-token-ttl";
 const sessionTokenKey = "session-token";
 const refreshTokenKey = "refresh-token";
 
-// function followedMangaList() {
-//   const currentSession = getFreshSessionToken();
-// }
+export async function followedMangaList() {
+  const sessionToken = await getFreshSessionToken();
+
+  const { data } = await chapterApi(sessionToken).getUserFollowsMangaFeed();
+
+  return data.results?.map(
+    (chapterResponse) => chapterResponse.data?.attributes
+  );
+}
 
 export async function login(
   userCredentials: MangadexUserCredentials

@@ -1,10 +1,22 @@
 import "@testing-library/jest-dom/extend-expect";
-import axios from "axios";
-import type { LoginResponse } from "mangadex-client";
-import { getFreshSessionToken, login } from "./client";
-import type { RefreshTokenResponse } from "./interfaces";
+import type {
+  ChapterList,
+  ChapterResponse,
+  LoginResponse,
+  RefreshResponse,
+} from "mangadex-client";
 
+import axios, { AxiosResponse } from "axios";
+import { followedMangaList, getFreshSessionToken, login } from "./client";
+import { chapterApi } from "./ChapterApi";
+import chapterFixture from "./__fixtures__/chapter";
+
+// TODO only mock mangadex-client
 const mockedAxios = axios as jest.Mocked<typeof axios>;
+jest.mock("./ChapterApi");
+const mockedChapterApi = chapterApi("mock-token") as jest.Mocked<
+  ReturnType<typeof chapterApi>
+>;
 
 describe("#getFreshSessionToken", () => {
   describe("when tokens were not previously persisted", () => {
@@ -101,7 +113,8 @@ describe("#getFreshSessionToken", () => {
 describe("#login", () => {
   describe("when request is successful", () => {
     it("stores and returns credentials", async () => {
-      // expect.assertions(4);
+      expect.assertions(4);
+      // expect.assertions(6);
       const loginResponse = {
         token: {
           session: "new-session",
@@ -130,5 +143,29 @@ describe("#login", () => {
       //   fifteenMinutesFromNow
       // );
     });
+  });
+});
+
+describe("#followedMangaList", () => {
+  it("returns list of followed manga's chapters", async () => {
+    expect.assertions(1);
+    const chapterResponse = {
+      data: { attributes: chapterFixture.attributes },
+    } as ChapterResponse;
+    const chapterList = { results: [chapterResponse] } as ChapterList;
+    mockedChapterApi.getUserFollowsMangaFeed.mockResolvedValueOnce({
+      data: chapterList,
+    } as AxiosResponse);
+
+    const result = await followedMangaList();
+
+    expect(result).toEqual([
+      expect.objectContaining({
+        title: chapterFixture.attributes.title,
+        translatedLanguage: chapterFixture.attributes.translatedLanguage,
+        publishAt: chapterFixture.attributes.publishAt,
+        // TODO add manga name and uploader
+      }),
+    ]);
   });
 });
