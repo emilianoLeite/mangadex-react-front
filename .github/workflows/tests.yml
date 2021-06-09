@@ -3,7 +3,7 @@ name: Tests
 on: [push]
 
 jobs:
-  tests:
+  unit:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '14.x'
-
+      - name: Build mangadex-client
+        run: cd ./mangadex-client && npm ci && npm run build && cd ../
       - run: yarn --frozen-lockfile
       - run: yarn test
 
