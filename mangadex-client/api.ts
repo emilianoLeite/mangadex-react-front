@@ -225,19 +225,19 @@ export interface Chapter {
      * @type {string}
      * @memberof Chapter
      */
-    id?: string;
+    id: string;
     /**
      * 
      * @type {string}
      * @memberof Chapter
      */
-    type?: ChapterTypeEnum;
+    type: ChapterTypeEnum;
     /**
      * 
      * @type {ChapterAttributes}
      * @memberof Chapter
      */
-    attributes?: ChapterAttributes;
+    attributes: ChapterAttributes;
 }
 
 /**
@@ -387,25 +387,25 @@ export interface ChapterList {
      * @type {Array<ChapterResponse>}
      * @memberof ChapterList
      */
-    results?: Array<ChapterResponse>;
+    results: Array<ChapterResponse>;
     /**
      * 
      * @type {number}
      * @memberof ChapterList
      */
-    limit?: number;
+    limit: number;
     /**
      * 
      * @type {number}
      * @memberof ChapterList
      */
-    offset?: number;
+    offset: number;
     /**
      * 
      * @type {number}
      * @memberof ChapterList
      */
-    total?: number;
+    total: number;
 }
 /**
  * 
@@ -467,19 +467,19 @@ export interface ChapterResponse {
      * @type {string}
      * @memberof ChapterResponse
      */
-    result?: ChapterResponseResultEnum;
+    result: ChapterResponseResultEnum;
     /**
      * 
      * @type {Chapter}
      * @memberof ChapterResponse
      */
-    data?: Chapter;
+    data: Chapter;
     /**
      * 
      * @type {Array<Relationship>}
      * @memberof ChapterResponse
      */
-    relationships?: Array<Relationship>;
+    relationships: Array<Relationship>;
 }
 
 /**
@@ -2474,13 +2474,13 @@ export interface Relationship {
      * @type {string}
      * @memberof Relationship
      */
-    id?: string;
+    id: string;
     /**
      * 
      * @type {string}
      * @memberof Relationship
      */
-    type?: string;
+    type: string;
 }
 /**
  * 

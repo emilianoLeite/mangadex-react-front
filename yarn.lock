@@ -7717,7 +7717,7 @@ makeerror@1.0.x:
     tmpl "1.0.x"
 
 mangadex-client@./mangadex-client:
-  version "5.0.28"
+  version "5.0.30"
   dependencies:
     axios "^0.21.1"
 
