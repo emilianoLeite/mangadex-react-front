@@ -1,4 +1,5 @@
 module.exports = {
+  root: true,
   env: {
     browser: true,
     es2021: true,
@@ -10,6 +11,8 @@ module.exports = {
     "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended",
+    "plugin:jest/recommended",
+    "plugin:jest/style",
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
@@ -19,7 +22,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["react", "@typescript-eslint", "cypress"],
+  plugins: ["react", "@typescript-eslint", "cypress", "jest"],
   rules: {
     indent: ["error", 2],
     "linebreak-style": ["error", "unix"],
@@ -28,5 +31,9 @@ module.exports = {
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
+    "jest/prefer-expect-assertions": [
+      "warn",
+      { onlyFunctionsWithAsyncKeyword: true },
+    ],
   },
 };

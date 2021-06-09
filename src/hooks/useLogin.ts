@@ -1,14 +1,7 @@
-import axios, { AxiosError } from "axios";
+import type { AxiosError } from "axios";
+import type { LoginResponse } from "mangadex-client";
 import { useMutation } from "react-query";
-
-interface LoginResponse {
-  result: "ok" | "error";
-  token: MangadexUserTokens;
-}
-interface MangadexUserTokens {
-  session: string;
-  refresh: string;
-}
+import { authApi } from "../lib/mangadex/AuthApi";
 
 interface MangadexUserCredentials {
   username: string;
@@ -17,12 +10,11 @@ interface MangadexUserCredentials {
 
 export function useLogin() {
   return useMutation<LoginResponse, AxiosError, MangadexUserCredentials>(
-    async ({ username, password }: MangadexUserCredentials) => {
-      const { data } = await axios.post<LoginResponse>(
-        "https://api.mangadex.org/auth/login",
-        { username, password }
-      );
-
+    async (userCredentials: MangadexUserCredentials) => {
+      // TODO use lib method
+      const { data } = await authApi.postAuthLogin({
+        login: userCredentials,
+      });
       return data;
     },
     { mutationKey: "login" }
