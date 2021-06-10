@@ -24,7 +24,7 @@ export function FollowedMangaList({ authToken }: Props) {
 
   return (
     <>
-      <h1>Followed Manga</h1>
+      <h1 data-cy="followed-manga-header">Followed Manga</h1>
       <div>{JSON.stringify(data)}</div>
     </>
   );
