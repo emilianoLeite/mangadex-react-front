@@ -1,5 +1,5 @@
 import { authApi } from "./AuthApi";
-import type { Login as MangadexUserCredentials } from "mangadex-client";
+import type { Login as MangadexUserCredentials } from "mangadex-api-client";
 import { chapterApi } from "./ChapterApi";
 
 type SessionToken = string;

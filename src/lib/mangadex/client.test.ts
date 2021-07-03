@@ -4,7 +4,7 @@ import type {
   ChapterResponse,
   LoginResponse,
   RefreshResponse,
-} from "mangadex-client";
+} from "mangadex-api-client";
 
 import axios, { AxiosResponse } from "axios";
 import { followedMangaList, getFreshSessionToken, login } from "./client";

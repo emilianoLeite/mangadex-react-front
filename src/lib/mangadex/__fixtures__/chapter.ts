@@ -1,4 +1,4 @@
-import { Chapter, ChapterTypeEnum } from "mangadex-client";
+import { Chapter, ChapterTypeEnum } from "mangadex-api-client";
 
 const fixture: Chapter = {
   id: "a05de006-df86-4fe1-9d20-32664a78c1cc",

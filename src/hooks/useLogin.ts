@@ -1,5 +1,5 @@
 import type { AxiosError } from "axios";
-import type { LoginResponse } from "mangadex-client";
+import type { LoginResponse } from "mangadex-api-client";
 import { useMutation } from "react-query";
 import { authApi } from "../lib/mangadex/AuthApi";
 
