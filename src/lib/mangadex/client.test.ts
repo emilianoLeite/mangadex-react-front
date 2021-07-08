@@ -240,7 +240,7 @@ describe("#followedMangaList", () => {
           title: chapterFixture.attributes.title,
           translatedLanguage: chapterFixture.attributes.translatedLanguage,
           publishAt: chapterFixture.attributes.publishAt,
-          // TODO add manga name and uploader
+          // TODO add manga name
         }),
       ]);
     });

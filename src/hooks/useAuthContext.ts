@@ -1,8 +1,9 @@
 import { createContext, useContext } from "react";
 import type { ValidCredentials } from "./useStoredCredentials/useStoredCredentials";
 
-export const AuthContext =
-  createContext<ValidCredentials | undefined>(undefined);
+export const AuthContext = createContext<ValidCredentials | undefined>(
+  undefined
+);
 
 export function useAuthContext() {
   const context = useContext(AuthContext);

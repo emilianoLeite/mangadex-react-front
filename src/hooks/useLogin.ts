@@ -11,7 +11,6 @@ interface MangadexUserCredentials {
 export function useLogin() {
   return useMutation<LoginResponse, AxiosError, MangadexUserCredentials>(
     async (userCredentials: MangadexUserCredentials) => {
-      // TODO use lib method
       const { data } = await authApi.postAuthLogin({
         login: userCredentials,
       });

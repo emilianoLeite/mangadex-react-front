@@ -2,6 +2,7 @@ import { authApi } from "./AuthApi";
 import type { Login as MangadexUserCredentials } from "mangadex-api-client";
 import { chapterApi } from "./ChapterApi";
 
+// TODO create tagged types, using unique symbols, to distinguish between SessionToken and RefreshToken and SessionTTL and arbitraty numbers
 type SessionToken = string;
 
 interface Credentials {
