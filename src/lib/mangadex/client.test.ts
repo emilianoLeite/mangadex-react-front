@@ -37,11 +37,11 @@ describe("#getFreshSessionToken", () => {
     const currentSessionToken = "currentSessionToken";
     const currentRefreshToken = "currentRefreshToken";
 
-    beforeAll(() => {
+    beforeEach(() => {
       window.localStorage.setItem("session-token", currentSessionToken);
       window.localStorage.setItem("refresh-token", currentRefreshToken);
     });
-    afterAll(() => {
+    afterEach(() => {
       window.localStorage.removeItem("session-token");
       window.localStorage.removeItem("refresh-token");
     });
@@ -49,10 +49,10 @@ describe("#getFreshSessionToken", () => {
     describe("when current sessionToken is still valid", () => {
       const oneHourFromNow = new Date().getTime() + 1000 * 60 * 60;
 
-      beforeAll(() => {
+      beforeEach(() => {
         window.localStorage.setItem("session-token-ttl", `${oneHourFromNow}`);
       });
-      afterAll(() => {
+      afterEach(() => {
         window.localStorage.removeItem("session-token-ttl");
       });
 
@@ -66,22 +66,22 @@ describe("#getFreshSessionToken", () => {
     });
 
     describe("when current sessionToken is expired, tries to refresh it", () => {
-      const oneHourAgo = new Date().getTime() - 1000 * 60 * 60;
+      const now = new Date().getTime();
+      const oneHourAgo = now - 1000 * 60 * 60;
 
-      beforeAll(() => {
+      beforeEach(() => {
         window.localStorage.setItem("session-token-ttl", `${oneHourAgo}`);
       });
-      afterAll(() => {
+      afterEach(() => {
         window.localStorage.removeItem("session-token-ttl");
       });
 
       describe("when refresh request is sucessful", () => {
         it("returns the new sessionToken and stores it", async () => {
-          expect.assertions(3);
-          // expect.assertions(4);
+          expect.assertions(4);
           const refreshTokenResponse = {
             token: {
-              session: "new-session2",
+              session: "new-session",
               refresh: "new-refresh",
             },
           };
@@ -93,10 +93,13 @@ describe("#getFreshSessionToken", () => {
           const freshToken = await getFreshSessionToken();
 
           expect(freshToken).toEqual("new-session");
-          // TODO: freeze time so we can assert TTL
-          // expect(window.localStorage.getItem("session-token-ttl")).toEqual(
-          //   `${fifteenMinutesFromNow}`
-          // );
+          // TODO: freeze time so we can assert the exact TTL
+          expect(
+            parseInt(
+              window.localStorage.getItem("session-token-ttl") ?? "0",
+              10
+            )
+          ).toBeGreaterThan(now);
           expect(window.localStorage.getItem("session-token")).toEqual(
             "new-session"
           );
@@ -124,15 +127,15 @@ describe("#getFreshSessionToken", () => {
 
 describe("#login", () => {
   describe("when supplying valid credentials", () => {
-    afterAll(() => {
+    afterEach(() => {
       window.localStorage.removeItem("session-token");
       window.localStorage.removeItem("refresh-token");
       window.localStorage.removeItem("session-token-ttl");
     });
 
     it("stores and returns credentials", async () => {
-      expect.assertions(4);
-      // expect.assertions(6);
+      expect.assertions(6);
+      const now = new Date().getTime();
       const loginResponse = {
         token: {
           session: "new-session",
@@ -149,17 +152,17 @@ describe("#login", () => {
 
       expect(result.refreshToken).toEqual("new-refresh");
       expect(result.sessionToken).toEqual("new-session");
-      // TODO: freeze time so we can assert TTL
-      // expect(result.sessionTTL).toEqual(fifteenMinutesFromNow);
+      // TODO: freeze time so we can assert exact TTL
+      expect(result.sessionTTL).toBeGreaterThan(now);
       expect(window.localStorage.getItem("refresh-token")).toEqual(
-        "new-refresh"
+        result.refreshToken
       );
       expect(window.localStorage.getItem("session-token")).toEqual(
-        "new-session"
+        result.sessionToken
       );
-      // expect(window.localStorage.getItem("session-token-ttl")).toEqual(
-      //   fifteenMinutesFromNow
-      // );
+      expect(
+        parseInt(window.localStorage.getItem("session-token-ttl") ?? "0", 10)
+      ).toEqual(result.sessionTTL);
     });
   });
   describe("when supplying invalid credentials", () => {
@@ -206,7 +209,7 @@ describe("#followedMangaList", () => {
   });
 
   describe("when tokens were previously persisted", () => {
-    beforeAll(() => {
+    beforeEach(() => {
       window.localStorage.setItem("session-token", "currentSessionToken");
       window.localStorage.setItem("refresh-token", "currentRefreshToken");
       window.localStorage.setItem(
@@ -214,7 +217,7 @@ describe("#followedMangaList", () => {
         fifteenMinutesFromNow().toString()
       );
     });
-    afterAll(() => {
+    afterEach(() => {
       window.localStorage.removeItem("session-token");
       window.localStorage.removeItem("refresh-token");
       window.localStorage.removeItem("session-token-ttl");
