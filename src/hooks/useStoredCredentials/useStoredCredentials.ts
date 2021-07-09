@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+// TODO: find a way to coaslesce with src/lib/mangadex/client.ts credentials management
 interface NewCredentials {
   sessionToken: string;
   refreshToken: string;
