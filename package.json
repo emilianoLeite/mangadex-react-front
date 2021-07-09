@@ -11,7 +11,7 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "axios": "^0.21.1",
-    "mangadex-api-client": "link:./mangadex-client",
+    "mangadex-api-client": "link:./mangadex-api-client",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-query": "^3.16.0",
