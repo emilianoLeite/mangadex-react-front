@@ -7604,7 +7604,7 @@ makeerror@1.0.x:
   dependencies:
     tmpl "1.0.x"
 
-"mangadex-api-client@link:./mangadex-client":
+"mangadex-api-client@link:./mangadex-api-client":
   version "0.0.0"
   uid ""
 
