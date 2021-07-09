@@ -9,6 +9,7 @@ interface NewCredentials {
 interface StoredCredentials {
   sessionToken: string | null;
   refreshToken: string | null;
+  sessionTokenTTL: string | null;
 }
 
 export type ValidCredentials = {
@@ -28,6 +29,7 @@ export function useStoredCredentials() {
   const [credentials, setCredentials] = useState<StoredCredentials>({
     sessionToken: window.localStorage.getItem(sessionTokenKey),
     refreshToken: window.localStorage.getItem(refreshTokenKey),
+    sessionTokenTTL: window.localStorage.getItem("session-token-ttl"),
   });
 
   function storeCredentials({
@@ -36,7 +38,15 @@ export function useStoredCredentials() {
   }: NewCredentials) {
     window.localStorage.setItem(sessionTokenKey, newSession);
     window.localStorage.setItem(refreshTokenKey, newRefresh);
-    setCredentials({ sessionToken: newSession, refreshToken: newRefresh });
+    window.localStorage.setItem(
+      "session-token-ttl",
+      `${new Date().getTime() * 1000 * 60 * 60}`
+    );
+    setCredentials({
+      sessionToken: newSession,
+      refreshToken: newRefresh,
+      sessionTokenTTL: `${new Date().getTime() * 1000 * 60 * 60}`,
+    });
   }
 
   return {
