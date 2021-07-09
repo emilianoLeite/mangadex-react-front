@@ -1,6 +1,6 @@
 {
   "name": "mangadex-api-client",
-  "version": "5.0.30",
+  "version": "5.0.31",
   "description": "OpenAPI client for mangadex.org",
   "author": "OpenAPI-Generator Contributors",
   "keywords": [
