@@ -1,3 +1,4 @@
+import assert from "assert";
 import { useQuery } from "react-query";
 import { followedMangaList } from "../lib/mangadex/client";
 
@@ -22,7 +23,19 @@ export function FollowedMangaList() {
       </>
     );
   } else {
-    content = <div>{JSON.stringify(data)}</div>;
+    assert(data, "data is not present");
+    content = (
+      <ul>
+        {data.map((mangaChapter) => {
+          return (
+            <li key={mangaChapter.title} data-cy="manga-list-item">
+              {mangaChapter.title}
+              {/* TODO: Handle empty title cases */}
+            </li>
+          );
+        })}
+      </ul>
+    );
   }
   return (
     <>
