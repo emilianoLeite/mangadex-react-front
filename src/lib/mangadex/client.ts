@@ -96,8 +96,15 @@ export async function getFreshSessionToken(): Promise<SessionToken> {
     ensureCredentialsArePersisted();
 
   if (new Date().getTime() < sessionTTL) {
+    console.debug(
+      `Returning non-expired token. Current time: ${new Date().getTime()}. Session TTL ${sessionTTL}`
+    );
+
     return sessionToken;
   } else {
+    console.debug(
+      `Token is expired, fetching new one. Current time: ${new Date().getTime()}. Session TTL ${sessionTTL}`
+    );
     try {
       const newCredentials = await refreshCredentials(refreshToken);
       storeCredentials(newCredentials);
