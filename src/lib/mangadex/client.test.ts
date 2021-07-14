@@ -4,19 +4,23 @@ import type {
   ChapterResponse,
   LoginResponse,
   RefreshResponse,
-} from "mangadex-client";
+} from "mangadex-api-client";
 
-import axios, { AxiosResponse } from "axios";
 import { followedMangaList, getFreshSessionToken, login } from "./client";
 import { chapterApi } from "./ChapterApi";
+import { authApi } from "./AuthApi";
 import chapterFixture from "./__fixtures__/chapter";
+import type { AxiosError, AxiosResponse } from "axios";
 
-// TODO only mock mangadex-client
-const mockedAxios = axios as jest.Mocked<typeof axios>;
 jest.mock("./ChapterApi");
 const mockedChapterApi = chapterApi("mock-token") as jest.Mocked<
   ReturnType<typeof chapterApi>
 >;
+
+jest.mock("./AuthApi");
+const mockedAuthApi = authApi as jest.Mocked<typeof authApi>;
+
+const fifteenMinutesFromNow = () => new Date().getTime() + 1000 * 60 * 15;
 
 describe("#getFreshSessionToken", () => {
   describe("when tokens were not previously persisted", () => {
@@ -37,12 +41,19 @@ describe("#getFreshSessionToken", () => {
       window.localStorage.setItem("session-token", currentSessionToken);
       window.localStorage.setItem("refresh-token", currentRefreshToken);
     });
+    afterEach(() => {
+      window.localStorage.removeItem("session-token");
+      window.localStorage.removeItem("refresh-token");
+    });
 
     describe("when current sessionToken is still valid", () => {
       const oneHourFromNow = new Date().getTime() + 1000 * 60 * 60;
 
       beforeEach(() => {
         window.localStorage.setItem("session-token-ttl", `${oneHourFromNow}`);
+      });
+      afterEach(() => {
+        window.localStorage.removeItem("session-token-ttl");
       });
 
       it("returns current sessionToken", async () => {
@@ -55,36 +66,40 @@ describe("#getFreshSessionToken", () => {
     });
 
     describe("when current sessionToken is expired, tries to refresh it", () => {
-      const oneHourAgo = new Date().getTime() - 1000 * 60 * 60;
+      const now = new Date().getTime();
+      const oneHourAgo = now - 1000 * 60 * 60;
 
       beforeEach(() => {
         window.localStorage.setItem("session-token-ttl", `${oneHourAgo}`);
       });
+      afterEach(() => {
+        window.localStorage.removeItem("session-token-ttl");
+      });
 
       describe("when refresh request is sucessful", () => {
-        const fifteenMinutesFromNow = new Date().getTime() + 1000 * 60 * 15;
-
         it("returns the new sessionToken and stores it", async () => {
-          expect.assertions(3);
-          // expect.assertions(4);
+          expect.assertions(4);
           const refreshTokenResponse = {
             token: {
               session: "new-session",
               refresh: "new-refresh",
             },
-          } as RefreshResponse;
+          };
           const axiosResponse = {
             data: refreshTokenResponse,
-          };
-          mockedAxios.post.mockResolvedValue(axiosResponse);
+          } as AxiosResponse<RefreshResponse>;
+          mockedAuthApi.postAuthRefresh.mockResolvedValue(axiosResponse);
 
           const freshToken = await getFreshSessionToken();
 
           expect(freshToken).toEqual("new-session");
-          // TODO: freeze time so we can assert TTL
-          // expect(window.localStorage.getItem("session-token-ttl")).toEqual(
-          //   `${fifteenMinutesFromNow}`
-          // );
+          // TODO: freeze time so we can assert the exact TTL
+          expect(
+            parseInt(
+              window.localStorage.getItem("session-token-ttl") ?? "0",
+              10
+            )
+          ).toBeGreaterThan(now);
           expect(window.localStorage.getItem("session-token")).toEqual(
             "new-session"
           );
@@ -94,11 +109,11 @@ describe("#getFreshSessionToken", () => {
         });
       });
 
-      describe("when refresh request is sucessful fails", () => {
+      describe("when refresh request fails", () => {
         it("rejects with error and clears storage", async () => {
           expect.assertions(4);
           const axiosError = { error: "anyError" };
-          mockedAxios.request.mockRejectedValueOnce(axiosError);
+          mockedAuthApi.postAuthRefresh.mockRejectedValueOnce(axiosError);
 
           await expect(getFreshSessionToken()).rejects.toEqual(axiosError);
           expect(window.localStorage.getItem("session-token-ttl")).toBeNull();
@@ -111,10 +126,16 @@ describe("#getFreshSessionToken", () => {
 });
 
 describe("#login", () => {
-  describe("when request is successful", () => {
+  describe("when supplying valid credentials", () => {
+    afterEach(() => {
+      window.localStorage.removeItem("session-token");
+      window.localStorage.removeItem("refresh-token");
+      window.localStorage.removeItem("session-token-ttl");
+    });
+
     it("stores and returns credentials", async () => {
-      expect.assertions(4);
-      // expect.assertions(6);
+      expect.assertions(6);
+      const now = new Date().getTime();
       const loginResponse = {
         token: {
           session: "new-session",
@@ -123,49 +144,105 @@ describe("#login", () => {
       } as LoginResponse;
       const axiosResponse = {
         data: loginResponse,
-      };
-      mockedAxios.request.mockResolvedValue(axiosResponse);
+      } as AxiosResponse<LoginResponse>;
+      mockedAuthApi.postAuthLogin.mockResolvedValue(axiosResponse);
       const userCredentials = { username: "user", password: "123" };
 
       const result = await login(userCredentials);
 
       expect(result.refreshToken).toEqual("new-refresh");
       expect(result.sessionToken).toEqual("new-session");
-      // TODO: freeze time so we can assert TTL
-      // expect(result.sessionTTL).toEqual(fifteenMinutesFromNow);
+      // TODO: freeze time so we can assert exact TTL
+      expect(result.sessionTTL).toBeGreaterThan(now);
       expect(window.localStorage.getItem("refresh-token")).toEqual(
-        "new-refresh"
+        result.refreshToken
       );
       expect(window.localStorage.getItem("session-token")).toEqual(
-        "new-session"
+        result.sessionToken
       );
-      // expect(window.localStorage.getItem("session-token-ttl")).toEqual(
-      //   fifteenMinutesFromNow
-      // );
+      expect(
+        parseInt(window.localStorage.getItem("session-token-ttl") ?? "0", 10)
+      ).toEqual(result.sessionTTL);
+    });
+  });
+  describe("when supplying invalid credentials", () => {
+    it("does not store credentials and throws an error", async () => {
+      expect.assertions(4);
+      const axiosError = {
+        response: {
+          data: {
+            errors: [
+              {
+                context: null,
+                detail: "User / Password does not match",
+                id: "0fd31c1e-bd06-5060-ac7c-66a2f8796e7b",
+                status: 401,
+                title: "unauthorized_http_exception",
+              },
+            ],
+            result: "error",
+          },
+          status: 401,
+        },
+      } as AxiosError;
+      mockedAuthApi.postAuthLogin.mockRejectedValue(axiosError);
+
+      await expect(
+        login({ username: "user", password: "123" })
+      ).rejects.toEqual(axiosError);
+      expect(window.localStorage.getItem("refresh-token")).toBeNull();
+      expect(window.localStorage.getItem("session-token")).toBeNull();
+      expect(window.localStorage.getItem("session-token-ttl")).toBeNull();
     });
   });
 });
 
 describe("#followedMangaList", () => {
-  it("returns list of followed manga's chapters", async () => {
-    expect.assertions(1);
-    const chapterResponse = {
-      data: { attributes: chapterFixture.attributes },
-    } as ChapterResponse;
-    const chapterList = { results: [chapterResponse] } as ChapterList;
-    mockedChapterApi.getUserFollowsMangaFeed.mockResolvedValueOnce({
-      data: chapterList,
-    } as AxiosResponse);
+  describe("when tokens were not previously persisted", () => {
+    it("throws an error", async () => {
+      expect.assertions(1);
 
-    const result = await followedMangaList();
+      await expect(followedMangaList()).rejects.toThrow(
+        "stored tokens not found"
+      );
+    });
+  });
 
-    expect(result).toEqual([
-      expect.objectContaining({
-        title: chapterFixture.attributes.title,
-        translatedLanguage: chapterFixture.attributes.translatedLanguage,
-        publishAt: chapterFixture.attributes.publishAt,
-        // TODO add manga name and uploader
-      }),
-    ]);
+  describe("when tokens were previously persisted", () => {
+    beforeEach(() => {
+      window.localStorage.setItem("session-token", "currentSessionToken");
+      window.localStorage.setItem("refresh-token", "currentRefreshToken");
+      window.localStorage.setItem(
+        "session-token-ttl",
+        fifteenMinutesFromNow().toString()
+      );
+    });
+    afterEach(() => {
+      window.localStorage.removeItem("session-token");
+      window.localStorage.removeItem("refresh-token");
+      window.localStorage.removeItem("session-token-ttl");
+    });
+
+    it("returns list of followed manga's chapters", async () => {
+      expect.assertions(1);
+      const chapterResponse = {
+        data: { attributes: chapterFixture.attributes },
+      } as ChapterResponse;
+      const chapterList = { results: [chapterResponse] } as ChapterList;
+      mockedChapterApi.getUserFollowsMangaFeed.mockResolvedValueOnce({
+        data: chapterList,
+      } as AxiosResponse);
+
+      const result = await followedMangaList();
+
+      expect(result).toEqual([
+        expect.objectContaining({
+          title: chapterFixture.attributes.title,
+          translatedLanguage: chapterFixture.attributes.translatedLanguage,
+          publishAt: chapterFixture.attributes.publishAt,
+          // TODO add manga name
+        }),
+      ]);
+    });
   });
 });

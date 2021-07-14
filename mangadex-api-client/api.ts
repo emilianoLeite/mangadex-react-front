@@ -259,73 +259,73 @@ export interface ChapterAttributes {
      * @type {string}
      * @memberof ChapterAttributes
      */
-    title?: string;
+    title: string;
     /**
      * 
      * @type {string}
      * @memberof ChapterAttributes
      */
-    volume?: string | null;
+    volume: string | null;
     /**
      * 
      * @type {string}
      * @memberof ChapterAttributes
      */
-    chapter?: string | null;
+    chapter: string | null;
     /**
      * 
      * @type {string}
      * @memberof ChapterAttributes
      */
-    translatedLanguage?: string;
+    translatedLanguage: string;
     /**
      * 
      * @type {string}
      * @memberof ChapterAttributes
      */
-    hash?: string;
+    hash: string;
     /**
      * 
      * @type {Array<string>}
      * @memberof ChapterAttributes
      */
-    data?: Array<string>;
+    data: Array<string>;
     /**
      * 
      * @type {Array<string>}
      * @memberof ChapterAttributes
      */
-    dataSaver?: Array<string>;
+    dataSaver: Array<string>;
     /**
      * 
      * @type {string}
      * @memberof ChapterAttributes
      */
-    uploader?: string;
+    uploader: string;
     /**
      * 
      * @type {number}
      * @memberof ChapterAttributes
      */
-    version?: number;
+    version: number;
     /**
      * 
      * @type {string}
      * @memberof ChapterAttributes
      */
-    createdAt?: string;
+    createdAt: string;
     /**
      * 
      * @type {string}
      * @memberof ChapterAttributes
      */
-    updatedAt?: string;
+    updatedAt: string;
     /**
      * 
      * @type {string}
      * @memberof ChapterAttributes
      */
-    publishAt?: string;
+    publishAt: string;
 }
 /**
  * 

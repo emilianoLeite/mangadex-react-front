@@ -25,21 +25,25 @@
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
+const oneHourFromNow = () => new Date().getTime() + 1000 * 60 * 60;
+
 Cypress.Commands.add(
   "login",
   (
-    { sessionToken, refreshToken } = {
+    { sessionToken, refreshToken, sessionTokenTTL } = {
       sessionToken: "cy-session-token",
       refreshToken: "cy-refresh-token",
+      sessionTokenTTL: oneHourFromNow(),
     }
   ) => {
     Cypress.log({
       name: "storing credentials",
-      message: `Session: ${sessionToken} \n Refresh: ${refreshToken}`,
+      message: `Session: ${sessionToken} \n Refresh: ${refreshToken} \n TTL: ${sessionTokenTTL}`,
     });
 
     window.localStorage.setItem("session-token", sessionToken);
     window.localStorage.setItem("refresh-token", refreshToken);
+    window.localStorage.setItem("session-token-ttl", sessionTokenTTL);
 
     return;
   }

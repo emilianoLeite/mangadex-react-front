@@ -23,6 +23,7 @@ module.exports = {
     sourceType: "module",
   },
   plugins: ["react", "@typescript-eslint", "cypress", "jest"],
+  ignorePatterns: ["./mangadex-client/**/*.js", "./mangadex-client/**/*.ts"],
   rules: {
     indent: ["error", 2],
     "linebreak-style": ["error", "unix"],

@@ -1,4 +1,8 @@
-import { Chapter, ChapterTypeEnum } from "mangadex-client";
+import {
+  Chapter,
+  ChapterAttributes,
+  ChapterTypeEnum,
+} from "mangadex-api-client";
 
 const fixture: Chapter = {
   id: "a05de006-df86-4fe1-9d20-32664a78c1cc",
@@ -20,7 +24,7 @@ const fixture: Chapter = {
     ],
     version: 1,
     publishAt: "2021-06-08T00:00:00Z",
-  },
+  } as ChapterAttributes,
 };
 
 export default fixture;

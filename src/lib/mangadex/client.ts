@@ -1,7 +1,8 @@
 import { authApi } from "./AuthApi";
-import type { Login as MangadexUserCredentials } from "mangadex-client";
+import type { Login as MangadexUserCredentials } from "mangadex-api-client";
 import { chapterApi } from "./ChapterApi";
 
+// TODO create tagged types, using unique symbols, to distinguish between SessionToken and RefreshToken and SessionTTL and arbitraty numbers
 type SessionToken = string;
 
 interface Credentials {
@@ -95,8 +96,15 @@ export async function getFreshSessionToken(): Promise<SessionToken> {
     ensureCredentialsArePersisted();
 
   if (new Date().getTime() < sessionTTL) {
+    console.debug(
+      `Returning non-expired token. Current time: ${new Date().getTime()}. Session TTL ${sessionTTL}`
+    );
+
     return sessionToken;
   } else {
+    console.debug(
+      `Token is expired, fetching new one. Current time: ${new Date().getTime()}. Session TTL ${sessionTTL}`
+    );
     try {
       const newCredentials = await refreshCredentials(refreshToken);
       storeCredentials(newCredentials);

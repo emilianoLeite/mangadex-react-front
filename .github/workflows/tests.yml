@@ -25,8 +25,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: '14.x'
-      - name: Build mangadex-client
-        run: cd ./mangadex-client && npm ci && npm run build && cd ../
+      - name: Build mangadex-api-client
+        run: cd ./mangadex-api-client && npm ci && npm run build && cd ../
       - run: yarn --frozen-lockfile
       - run: yarn test
 
@@ -35,6 +35,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Build mangadex-api-client
+        run: cd ./mangadex-api-client && npm ci && npm run build && cd ../
       # Install NPM dependencies, cache them correctly
       # and run all Cypress tests
       - name: Cypress run
